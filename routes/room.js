@@ -21,7 +21,7 @@ function auth(req, res, next) {
 
 // Creating a room
 router.post("/create-room", auth, createRoom);
-// lJoining a room
+// Joining a room
 router.post("/join-room", auth, joinRoom);
 
 module.exports = router;

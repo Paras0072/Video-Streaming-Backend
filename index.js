@@ -6,6 +6,10 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const http = require("http");
 const cors = require("cors");
+const WebSocket = require("ws");
+const jwt = require("jsonwebtoken");
+const { handleSignalingData } = require("./controllers/roomController");
+const { leaveRoom } = require("./controllers/roomController");
 
 // for accessing env files
 require("dotenv").config();
@@ -29,6 +33,22 @@ app.use(express.json());
 
 // using express routers
 app.use(require("./routes"));
+
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server }); // Create a WebSocket server
+wss.on("connection", (ws) => {
+  console.log("Client connected");
+
+  ws.on("message", (data) => {
+    const message = JSON.parse(data);
+    handleSignalingData(ws, message);
+  });
+
+  ws.on("close", () => {
+    console.log("Client disconnected");
+    leaveRoom(ws);
+  });
+});
 
 app.use(bodyParser.json());
 
